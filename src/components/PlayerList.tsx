@@ -45,7 +45,10 @@ export default function PlayerList({ onPlayerSelect }: PlayerListProps) {
       {players.map((player) => (
         <div
           key={player.id}
-          onClick={() => onPlayerSelect(player)}
+          onClick={() => {
+            console.log("Jugador seleccionado:", player); // Verifica el jugador seleccionado
+            onPlayerSelect(player);
+          }}
           style={{ cursor: "pointer" }}
         >
           <PlayerCard player={player} onSelect={undefined} />

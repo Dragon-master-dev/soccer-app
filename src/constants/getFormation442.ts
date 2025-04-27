@@ -1,6 +1,6 @@
 // formation442.ts
 export const formation442 = [
-  { x: 50, y: 134 }, // Portero abajo
+  { x: 50, y: 123 }, // Portero abajo
 
   { x: 20, y: 100 }, // Defensas
   { x: 40, y: 100 },

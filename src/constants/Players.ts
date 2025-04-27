@@ -6,4 +6,5 @@ export interface Player {
   position: string;
   image_url: string;
   number?: string | number;
+  nationality?: string;
 }

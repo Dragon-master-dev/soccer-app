@@ -2,11 +2,21 @@
 import React from "react";
 import RadarChart from "react-svg-radar-chart";
 import "react-svg-radar-chart/build/css/index.css";
-import { Card, CardMedia, Box, Typography } from "@mui/material";
+import {
+  Card,
+  CardMedia,
+  Box,
+  Typography,
+  Divider,
+  List,
+  ListItem,
+  ListItemText,
+} from "@mui/material";
 import { getPositionColor } from "../constants/getPositionColor";
-import { grey, lightGreen } from "@mui/material/colors";
+import { grey } from "@mui/material/colors";
 import MiniMenu from "../components/MiniMenu";
 import CardMenu from "../components/CardMenu";
+
 // Normalizador
 const normalize = (value, min, max) => (value - min) / (max - min);
 
@@ -14,9 +24,9 @@ const normalize = (value, min, max) => (value - min) / (max - min);
 const captions = {
   acceleration: "Aceleración",
   jumping_reach: "Salto",
-  shot: "Disparo",
-  height: "Estatura",
-  weight: "Peso",
+  shot_power: "Disparo",
+  height: "Estatura (cm)",
+  weight: "Peso (Kg)",
 };
 
 export default function RadarChartPlayerStats({ player }) {
@@ -42,13 +52,13 @@ export default function RadarChartPlayerStats({ player }) {
   const data = [
     {
       data: {
-        acceleration: normalize(acceleration, 10, 100), // margen extra por si suben más
-        jumping_reach: normalize(jumping_reach, 30, 100), // rango real observado
-        shot: normalize(shot_power, 65, 115), // justo para tu data
-        height: normalize(height, 160, 200), // ya está bien
-        weight: normalize(weight, 55, 100), // ya está bien
+        acceleration: normalize(acceleration, 10, 100),
+        jumping_reach: normalize(jumping_reach, 30, 100),
+        shot_power: normalize(shot_power, 65, 115),
+        height: normalize(height, 160, 200),
+        weight: normalize(weight, 55, 100),
       },
-      meta: { color: "green", name },
+      meta: { color: getPositionColor(position || ""), name },
     },
   ];
 
@@ -64,7 +74,7 @@ export default function RadarChartPlayerStats({ player }) {
         minWidth: "250px",
       }}
     >
-      <MiniMenu> </MiniMenu>
+      <MiniMenu />
       <CardMedia
         component="img"
         image={image_url}
@@ -91,7 +101,7 @@ export default function RadarChartPlayerStats({ player }) {
         color="rgb(245, 245, 245)"
         textAlign="center"
         gutterBottom
-        marginBottom={5}
+        marginBottom={2}
         fontFamily={"Arial"}
         fontSize={15}
         fontWeight={400}
@@ -135,29 +145,95 @@ export default function RadarChartPlayerStats({ player }) {
         >
           {position}
         </Typography>
+        <Typography
+          variant="subtitle2"
+          color={grey[900]}
+          textAlign="center"
+          backgroundColor={grey[300]}
+          borderRadius={5}
+          padding={0.5}
+        >
+          Pais:{" " + player.nationality}
+        </Typography>
       </Box>
-      <RadarChart
-        captions={captions}
-        data={data}
-        size={220}
-        options={{
-          dots: true,
-          scales: 3,
-          zoomDistance: 1,
-          captionMargin: 20,
-          captionProps: () => ({
-            fontSize: 13,
-            fill: "black",
-            fontFamily: "Roboto",
-          }),
-          scaleProps: () => ({
-            fill: "rgba(255, 255, 255, 0.52)",
-            stroke: grey[300],
-            strokeWidth: 1,
-          }),
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          gap: 1,
+          border: 1,
+          borderColor: grey[300],
+          borderTopLeftRadius: "45%",
+          borderBottomLeftRadius: "10%",
+          mb: 7,
+          mt: 4.5,
+          alignItems: "center",
         }}
-      />
-      <CardMenu />
+      >
+        <RadarChart
+          captions={captions}
+          data={data}
+          size={200}
+          options={{
+            dots: true,
+            scales: 3,
+            zoomDistance: 1,
+            captionMargin: 20,
+            captionProps: () => ({
+              fontSize: 13,
+              fill: "rgb(66, 66, 66)",
+              fontFamily: "Roboto",
+            }),
+            scaleProps: () => ({
+              fill: "rgba(255, 255, 255, 0.52)",
+              stroke: grey[300],
+              strokeWidth: 1,
+            }),
+          }}
+        />
+        {/* Pasamos el jugador activo como prop a CardMenu */}
+
+        <List
+          sx={{
+            bgcolor: "rgba(231, 231, 231, 0.35)",
+            padding: 0,
+          }}
+        >
+          {/* Filtramos las propiedades del objeto player que están en el radar chart */}
+          {Object.entries(player)
+            .filter(([key]) => Object.keys(captions).includes(key)) // Filtra solo las claves que están en captions
+            .map(([key, value]) => (
+              <ListItem
+                key={key}
+                sx={{
+                  display: "flex",
+                  flexDirection: "column", // Alineamos cada clave-valor en columna
+                  alignItems: "center", // Centramos el contenido
+                  textAlign: "center", // Centramos el texto
+                  paddingBlock: 0,
+                  paddingInline: 1,
+                }}
+              >
+                <ListItemText
+                  primary={captions[key]} // Texto principal
+                  secondary={value} // Texto secundario
+                  primaryTypographyProps={{
+                    fontSize: 10, // Tamaño del texto principal
+                    fontWeight: "bold", // Grosor del texto principal
+                    color: grey[900], // Color del texto principal
+                  }}
+                  secondaryTypographyProps={{
+                    fontSize: 15, // Tamaño del texto secundario
+                    fontWeight: "normal", // Grosor del texto secundario
+                    color: grey[700], // Color del texto secundario
+                  }}
+                />
+              </ListItem>
+            ))}
+        </List>
+      </Box>
+
+      <CardMenu activePlayer={player} />
     </Card>
   );
 }

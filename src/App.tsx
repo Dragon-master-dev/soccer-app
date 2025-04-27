@@ -1,4 +1,4 @@
-App.jsx;
+//App.jsx;
 import { useState } from "react";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
@@ -23,8 +23,8 @@ export default function App() {
             sx={{
               padding: 2,
               height: "97.5vh",
-              backgroundColor: "rgba(48, 34, 255, 0.15)",
-              backdropFilter: "blur(50px)",
+              backgroundColor: "rgba(0, 141, 28, 0.47)",
+              backdropFilter: "blur(20px)",
               borderRadius: 3,
               boxShadow: 3,
               border: "1px solid rgba(255, 255, 255, 0.2)",

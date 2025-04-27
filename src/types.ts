@@ -1,6 +1,8 @@
 // src/types.ts
 
 export interface Player {
+  number: string;
+  image_url: string | undefined;
   id: number;
   name: string;
   team: string;

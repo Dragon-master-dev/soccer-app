@@ -1,12 +1,17 @@
 import { formation442 } from "../constants/getFormation442";
 import FieldLines from "./FieldLines";
+import { getPositionColor } from "../constants/getPositionColor";
+import { usePlayerAssignment } from "./PlayerAssignmentContext";
+import { Player } from "../types";
 
 type Props = {
-  onPositionSelect?: (index: number) => void;
-  assignedPlayers?: string[];
+  onPositionSelect: (index: number) => void;
+  assignedPlayers: (Player | null)[]; // Add the assignedPlayers property to the Props type.
 };
 
-const FieldView = ({ onPositionSelect, assignedPlayers = [] }: Props) => {
+const FieldView = ({ onPositionSelect }: Props) => {
+  const { assignedPlayers } = usePlayerAssignment();
+
   return (
     <div style={{ width: "100%", height: "100%" }}>
       <svg
@@ -17,45 +22,103 @@ const FieldView = ({ onPositionSelect, assignedPlayers = [] }: Props) => {
       >
         <FieldLines />
 
-        {formation442.map((pos, index) => (
-          <g
-            key={index}
-            onClick={() => onPositionSelect?.(index)}
-            style={{ cursor: "pointer" }}
-          >
-            <circle
-              cx={pos.x}
-              cy={pos.y}
-              r="5"
-              fill="white"
-              stroke="rgb(0, 109, 234)"
-              strokeWidth="1"
-            />
-            <text
-              x={pos.x}
-              y={pos.y + 0.8}
-              textAnchor="middle"
-              fontFamily="roboto"
-              fontSize="4"
-              fontWeight="800"
-              fill="rgb(73, 93, 111)"
-              alignmentBaseline="middle"
+        {formation442.map((pos, index) => {
+          const player = assignedPlayers[index];
+
+          // Procesamos el nombre del jugador
+          const processedName = player
+            ? `${player.name.split(" ")[0]} ${
+                player.name.split(" ")[1]?.charAt(0) || ""
+              }.`
+            : "";
+
+          return (
+            <g
+              key={index}
+              onClick={() => onPositionSelect?.(index)}
+              style={{ cursor: "pointer" }}
             >
-              {index + 1}
-            </text>
-            {assignedPlayers[index] && (
-              <text
-                x={pos.x}
-                y={pos.y + 7}
-                textAnchor="middle"
-                fontSize="3"
+              {/* Círculo base que representa la posición en el campo */}
+              <circle
+                cx={pos.x}
+                cy={pos.y}
+                r="6"
                 fill="white"
-              >
-                {assignedPlayers[index]}
-              </text>
-            )}
-          </g>
-        ))}
+                stroke={
+                  player ? getPositionColor(player.position || "") : "gray"
+                }
+                strokeWidth="1"
+              />
+
+              {/* Si hay un jugador asignado, mostramos su imagen y detalles */}
+              {player && (
+                <>
+                  {/* Imagen del jugador */}
+                  <image
+                    href={player.image_url}
+                    x={pos.x - 6}
+                    y={pos.y - 6}
+                    width="12"
+                    height="12"
+                    clipPath="circle(5.5px at center)"
+                  />
+
+                  {/* Nombre del jugador con estilo */}
+                  <text
+                    x={pos.x}
+                    y={pos.y + 10}
+                    textAnchor="middle"
+                    fontSize="3.5"
+                    fontWeight="600"
+                    fontFamily="Roboto"
+                    fill={
+                      player ? getPositionColor(player.position || "") : "gray"
+                    }
+                    style={{
+                      backgroundColor: "white", // Fondo blanco
+                      borderRadius: "5px", // Bordes redondeados
+                      padding: "2px", // Espaciado interno
+                    }}
+                  >
+                    {processedName}
+                  </text>
+
+                  {/* Número del jugador con estilo */}
+                  <text
+                    x={pos.x}
+                    y={pos.y + 14}
+                    textAnchor="middle"
+                    fontSize="3.5"
+                    fontFamily="Roboto"
+                    fill="white"
+                    style={{
+                      backgroundColor: "white", // Fondo blanco
+                      borderRadius: "5px", // Bordes redondeados
+                      padding: "2px", // Espaciado interno
+                    }}
+                  >
+                    #{player.number ?? "?"}
+                  </text>
+                </>
+              )}
+
+              {/* Si no hay jugador asignado, mostramos la leyenda "No asignado" */}
+              {!player && (
+                <text
+                  x={pos.x}
+                  y={pos.y + 10}
+                  textAnchor="middle"
+                  fontSize="2.5"
+                  fontWeight="200"
+                  fontFamily="Roboto"
+                  fill="white"
+                >
+                  No asignado
+                </text>
+              )}
+            </g>
+          );
+        })}
       </svg>
     </div>
   );
